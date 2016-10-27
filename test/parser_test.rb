@@ -4,6 +4,7 @@ require './lib/parser'
 
 class ParserTest < Minitest::Test
   attr_reader :default_array
+
   def setup
     @default_array = ["POST /hello HTTP/1.1",
                     "Host: localhost:9292",
@@ -88,7 +89,6 @@ class ParserTest < Minitest::Test
   end
 
   def test_that_arguments_are_parsed
-    #why is the instance necessary here?
     parse = Parser.new(@default_params_array)
     parsed_params = {:key=>"stupify"}
     assert_equal parsed_params, parse.params

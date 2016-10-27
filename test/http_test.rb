@@ -2,14 +2,6 @@ require 'faraday'
 require 'minitest/autorun'
 require 'minitest/pride'
 
-############
-############
-###########
-# clean up unnecessary faraday tests
-# add more faraday tests that encapsulate games
-# probably need faraday tests for status responses
-# faraday test that get to /hello body response has hello world
-
 class ServerTest < Minitest::Test
   attr_reader :url
 
@@ -27,31 +19,34 @@ class ServerTest < Minitest::Test
     assert_equal 9292, response.port
   end
 
-  def test_that_response_is_parsed      
-    response = Faraday.get("http://127.0.0.1:9292/hello/")
-    assert_equal "<html><head></head><body><pre></pre></body></html>", response.env.body
+  def test_that_response_is_parsed_and_path_accurate     
+    response = Faraday.get("http://127.0.0.1:9292/hello")
+    assert response.body.include?("Hello, World!")
   end
 
-  def test_that_post_data_is_received      
-    response = Faraday.post("http://127.0.0.1:9292/"), {:guess => 33}
-    params = {:guess=>33}
-    assert_equal params, response[1]
+  def test_that_post_to_start_game_starts_game   
+    response = Faraday.post("http://127.0.0.1:9292/start_game")
+    assert response.body.include?("Good Luck!")
   end
 
-  def test_that_post_to_start_game_starts_game      
-    response = Faraday.post("http://127.0.0.1:9292/start_game/")
-    assert_equal "<html><head></head><body><pre>Good Luck!</pre></body></html>", response.body
+  def test_that_get_to_datetime_returns_datetime
+    response = Faraday.get("http://127.0.0.1:9292/datetime")
+    assert response.body.include?("2016")
   end
 
-  def test_that_get_to_game_returns_no_game_if_no_post_to_start_game_has_happened
-    respond = Faraday.get("http://127.0.0.1:9292/game/")
-    assert_equal "<html><head></head><body><pre>plz start game</pre></body></html>", respond.body
+  def test_that_get_to_root_returns_response_message
+    response = Faraday.get("http://127.0.0.1:9292/")
+    assert response.body.include?("<html><head></head><body><pre>")
   end
 
-  def test_that_get_to_game_returns_blank_data_if_game_has_been_started_but_no_guesses_made
-    Faraday.post "http://127.0.0.1:9292/start_game/"
-    response = Faraday.get("http://127.0.0.1:9292/game/")
-    assert_equal "<html><head></head><body><pre>0 guesses made</pre></body></html>", response.body
+  def test_that_get_to_wordsearch_returns_real_words
+    response = Faraday.get("http://127.0.0.1:9292/word_search?word=stupidier")
+    assert response.body.include?('stupidier is not a known word')
+  end
+
+  def test_that_get_to_wordsearch_returns_fake_words
+    response = Faraday.get("http://127.0.0.1:9292/word_search?word=stupid")
+    assert response.body.include?('stupid is a known word')
   end
     
 end

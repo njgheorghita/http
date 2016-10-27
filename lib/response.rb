@@ -28,7 +28,11 @@ class Response
 
   def output
     html_insert = html_output_by_path[parsed[:Path]].()
-    return "<html><head></head><body><pre>#{html_insert}</pre></body></html>"
+    if @parsed[:Path] == '/'
+      return "<html><head></head><body><pre>#{html_insert}</pre></body></html>"
+    else 
+      return "<html><head></head><body><pre>#{html_insert}</pre><h6>#{@parsed}</h6></body></html>"
+    end
   end
 
   def game_output
@@ -72,7 +76,6 @@ class Response
     Time.new.strftime("%m:%M%p on %A, %B %e, %Y")
   end
 
-  # IMPLEMENT CLOSE SERVER LOGIC
   def shutdown_response
     "You have made #{counter} requests : Goodbye"
   end
@@ -82,7 +85,6 @@ class Response
     Dictionary.new.is_word?(single_word_hash[:key])
   end
 
-  # CREATE LOGIC TO GET HERE IF NO PATH
   def error_response
     "404 NOT FOUND"
   end

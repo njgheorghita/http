@@ -14,7 +14,6 @@ class Parser
 
   def path 
     arg = first_line.split[1]
-  #refactor
     if arg.include?("?")
       params
     end
@@ -51,7 +50,6 @@ class Parser
   end
 
   def origin 
-  #refactor
     unless request_lines.find {|line| line.include?("Origin:")} == nil
            request_lines.find {|line| line.include?("Origin:")}.split[1]
     end

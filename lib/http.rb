@@ -20,13 +20,11 @@ loop do
 
   parsed_incoming = Parser.new(request_lines).parsed_response
   
-  data = client.read(parsed_incoming[:Content_Length].to_i)
+  body_data = client.read(parsed_incoming[:Content_Length].to_i)
   
-  response_processing = Response.new(parsed_incoming, counter, current_game, data)
+  response_processing = Response.new(parsed_incoming, counter, current_game, body_data)
   response = response_processing.output
   current_game = response_processing.game_output
-  # if !cases.include?(parsed_incoming.path)
-  #     headers = HeaderBuild.new(output, 404)
 
   if parsed_incoming[:Verb] == "GET"
     headers = HeaderBuild.new(response).header
@@ -39,7 +37,6 @@ loop do
   end
 
   client.puts headers
-
   client.puts response
 
   puts ["This was displayed in your sexy browser:", response].join("\n")
