@@ -1,9 +1,11 @@
 require 'minitest/autorun'
 require 'minitest/pride'
 require './lib/parser'
+require './lib/header'
 
 class ParserTest < Minitest::Test
-  attr_reader :default_array
+  attr_reader :default_array,
+              :default_params_array
 
   def setup
     @default_array = ["POST /hello HTTP/1.1",
@@ -47,7 +49,7 @@ class ParserTest < Minitest::Test
 
   def test_that_content_length_is_parsed
     parse = Parser.new(default_array)
-    assert_equal "0", parse.content_length
+    assert_equal "0", parse.content_length.split[1]
   end
 
   def test_that_protocol_is_parsed
@@ -67,7 +69,7 @@ class ParserTest < Minitest::Test
 
   def test_that_origin_is_parsed
     parse = Parser.new(default_array)
-    assert_equal "chrome-extension://fhbjgbiflinjbdggehcddcbncdddomop", parse.origin 
+    assert_equal "chrome-extension://fhbjgbiflinjbdggehcddcbncdddomop", parse.origin.split[1]
   end
 
   def test_that_accept_is_parsed
@@ -89,25 +91,14 @@ class ParserTest < Minitest::Test
   end
 
   def test_that_arguments_are_parsed
-    parse = Parser.new(@default_params_array)
+    parse = Parser.new(default_params_array)
     parsed_params = {:key=>"stupify"}
     assert_equal parsed_params, parse.params
   end
 
-  def test_that_parse_puts_outputs_guess
-    parse = ParsePuts.new("------WebKitFormBoundaryBtP1caTdGoqQYVzO\r\nContent-Disposition: form-data; name=\"guess\"\r\n\r\n33\r\n------WebKitFormBoundaryBtP1caTdGoqQYVzO--\r\n")
-    assert_equal 33, parse.output
+  def test_that_parse_post_outputs_guess
+    parse = Parser.new("------WebKitFormBoundaryBtP1caTdGoqQYVzO\r\nContent-Disposition: form-data; name=\"guess\"\r\n\r\n33\r\n------WebKitFormBoundaryBtP1caTdGoqQYVzO--\r\n")
+    assert_equal 33, parse.parse_post
   end
 
-  def test_that_standard_header_is_built
-    header = HeaderBuild.new("<html><head></head><body><pre></pre></body></html>")
-    standard_header = ["http/1.1 200 ok", "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}", "server: ruby", "content-type: text/html; charset=iso-8859-1", "content-length: 50\r\n\r\n"].join("\r\n")
-    assert_equal standard_header, header.header
-  end
-
-  def test_that_redirect_header_is_built
-    header = HeaderBuild.new("<html><head></head><body><pre></pre></body></html>", 302, "http://localserver:9292/game")
-    redirect_header = [ "http/1.1 302 Redirecting","location: http://localserver:9292/game", "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}","server: ruby", "content-type: text/html; charset=iso-8859-1","content-length: 50\r\n\r\n"].join("\r\n")
-    assert_equal redirect_header, header.header
-  end
 end

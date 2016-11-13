@@ -1,6 +1,7 @@
 require 'faraday'
 require 'minitest/autorun'
 require 'minitest/pride'
+require './lib/http'
 
 class ServerTest < Minitest::Test
   attr_reader :url
@@ -19,7 +20,7 @@ class ServerTest < Minitest::Test
     assert_equal 9292, response.port
   end
 
-  def test_that_response_is_parsed_and_path_accurate     
+  def test_that_response_is_parsed_and_path_accurate    
     response = Faraday.get("http://127.0.0.1:9292/hello")
     assert response.body.include?("Hello, World!")
   end

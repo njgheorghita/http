@@ -22,8 +22,7 @@ class GameTest < Minitest::Test
 
   def test_that_game_recognizes_if_guess_made_outside_of_zero_to_hundred_range
     game = Game.new
-    game.incoming_guess(101)
-    assert_equal "try guessing between 0 -> 100", game.message
+    assert_equal "try guessing between 0 -> 100",  game.incoming_guess(101)
   end
 
 end 
